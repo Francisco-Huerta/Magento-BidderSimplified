@@ -8,6 +8,5 @@
         </referenceBlock>
         <referenceBlock name="marketplace_product_add_downloadable" remove="true"/>
         <referenceBlock name="marketplace_product_add_configurable" remove="true"/>
-        <referenceBlock name="marketplace_product_add_downloadable" remove="true"/>
     </body>
 </page>
