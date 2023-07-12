@@ -22,93 +22,104 @@ $skuType = $helper->getSkuType();
 $skuPrefix = $helper->getSkuPrefix();
 $data = $block->getPersistentData();
 $weightUnit = $helper->getWeightUnit();
-$allowProductType =$block->getAllowedProductType();
-
+$allowProductType = $block->getAllowedProductType();
+// Added the option to select if it's used or not
+$condicionOptions = $block->getAttributeOptions('condicion');
+// echo "<pre>"; print_r($condicionOptions); exit;
 if (!empty($data['set'])) {
     $set = $data['set'];
 }
 ?>
 <form action="<?= $escaper->escapeUrl($block
-->getUrl('marketplace/product/save', ['_secure' => $block->getRequest()->isSecure()])) ?>"
- enctype="multipart/form-data" method="post" id="edit-product" data-form="edit-product"
-  data-mage-init='{"validation":{}}'>
+    ->getUrl('marketplace/product/save', ['_secure' => $block->getRequest()->isSecure()])) ?>"
+    enctype="multipart/form-data" method="post" id="edit-product" data-form="edit-product"
+    data-mage-init='{"validation":{}}'>
     <div class="wk-mp-design" id="wk-bodymain">
         <fieldset class="fieldset info wk-mp-fieldset">
             <div data-mage-init='{"formButtonAction": {}}' class="wk-mp-page-title legend">
-                <span><?= $escaper->escapeHtml(__('Add Product')) ?></span>
-                <button class="button wk-mp-btn" title="<?= $escaper->escapeHtml(__('Save')) ?>"
-                 type="submit" id="save-btn">
-                    <span><span><?= $escaper->escapeHtml(__('Save')) ?></span></span>
+                <span>
+                    <?= $escaper->escapeHtml(__('Add Product')) ?>
+                </span>
+                <button class="button wk-mp-btn" title="<?= $escaper->escapeHtml(__('Save')) ?>" type="submit"
+                    id="save-btn">
+                    <span><span>
+                            <?= $escaper->escapeHtml(__('Save')) ?>
+                        </span></span>
                 </button>
-                <button class="button wk-mp-btn" 
-                title="<?= $escaper->escapeHtml(__('Save & Duplicate')) ?>" 
-                type="button" id="wk-mp-save-duplicate-btn">
-                    <span><span><?= $escaper->escapeHtml(__('Save & Duplicate')) ?></span></span>
+                <button class="button wk-mp-btn" title="<?= $escaper->escapeHtml(__('Save & Duplicate')) ?>"
+                    type="button" id="wk-mp-save-duplicate-btn">
+                    <span><span>
+                            <?= $escaper->escapeHtml(__('Save & Duplicate')) ?>
+                        </span></span>
                 </button>
             </div>
-            <?= $block->getBlockHtml('formkey')?>
-            <?= $block->getBlockHtml('seller.formkey')?>
-            <input id="product_type_id" name="type" type="hidden"
-             value="<?= $escaper->escapeHtml($type)?>" value="<?= $escaper->escapeHtml($data['type'])?>">
+            <?= $block->getBlockHtml('formkey') ?>
+            <?= $block->getBlockHtml('seller.formkey') ?>
+            <input id="product_type_id" name="type" type="hidden" value="<?= $escaper->escapeHtml($type) ?>"
+                value="<?= $escaper->escapeHtml($data['type']) ?>">
             <?php if (count($helper->getAllowedSets()) > 1): ?>
                 <div class="field required">
-                    <label class="label"><?= $escaper->escapeHtml(__('Attribute Set')) ?>:</label>
+                    <label class="label">
+                        <?= $escaper->escapeHtml(__('Attribute Set')) ?>:
+                    </label>
                     <div class="control">
                         <select name="set" id="attribute-set-id" class="required-entry">
-                        <?php foreach ($helper->getAllowedSets() as $setval): ?>
-                            <option value="<?= $escaper->escapeHtml($setval['value']) ?>"
-                             <?php if ($set==$setval['value']) { ?> selected="selected" <?php } ?>>
-                                <?= $escaper->escapeHtml($setval['label'])?>
-                            </option>
-                        <?php endforeach; ?>
+                            <?php foreach ($helper->getAllowedSets() as $setval): ?>
+                                <option value="<?= $escaper->escapeHtml($setval['value']) ?>" <?php if ($set == $setval['value']) { ?> selected="selected" <?php } ?>>
+                                    <?= $escaper->escapeHtml($setval['label']) ?>
+                                </option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
                 </div>
             <?php else: ?>
                 <?php $allowedSets = $helper->getAllowedSets(); ?>
-                <input type="hidden" name="set" id="attribute-set-id" 
-                value="<?= $escaper->escapeHtml($allowedSets[0]['value']) ?>" />
+                <input type="hidden" name="set" id="attribute-set-id"
+                    value="<?= $escaper->escapeHtml($allowedSets[0]['value']) ?>" />
             <?php endif; ?>
-
+            
             <div class="field" style="display: none;">
-                <label class="label"><?= $escaper->escapeHtml(__('Product Category')) ?>:</label>
+                <label class="label">
+                    <?= $escaper->escapeHtml(__('Product Category')) ?>:
+                </label>
                 <?php if ($product_hint_status && $helper->getProductHintCategory()): ?>
                     <img src="<?= $escaper->escapeUrl($block
-                    ->getViewFileUrl('Webkul_Marketplace::images/quest.png')); ?>"
-                     class='questimg' title="<?= $escaper->escapeHtml($helper->getProductHintCategory()) ?>"/>
+                        ->getViewFileUrl('Webkul_Marketplace::images/quest.png')); ?>" class='questimg'
+                        title="<?= $escaper->escapeHtml($helper->getProductHintCategory()) ?>" />
                 <?php endif; ?>
                 <?php if ($helper->getIsAdminViewCategoryTree()) { ?>
                     <div data-bind="scope: 'sellerCategory'">
                         <!-- ko template: getTemplate() --><!-- /ko -->
                     </div>
                     <script type="text/x-magento-init">
-                        {
-                            "*": {
-                                "Magento_Ui/js/core/app": {
-                                    "components": {
-                                        "sellerCategory": {
-                                            "component": "Webkul_Marketplace/js/product/seller-category-tree",
-                                            "template" : "Webkul_Marketplace/seller-category-tree",
-                                            "filterOptions": true,
-                                            "levelsVisibility": "1",
-                                            "options": <?= /* @noEscape */ $block->getCategoriesTree()?>,
-                                            "value": <?= /* @noEscape */ json_encode($data['product']['category_ids'])?>
+                            {
+                                "*": {
+                                    "Magento_Ui/js/core/app": {
+                                        "components": {
+                                            "sellerCategory": {
+                                                "component": "Webkul_Marketplace/js/product/seller-category-tree",
+                                                "template" : "Webkul_Marketplace/seller-category-tree",
+                                                "filterOptions": true,
+                                                "levelsVisibility": "1",
+                                                "options": <?= /* @noEscape */$block->getCategoriesTree() ?>,
+                                                "value": <?= /* @noEscape */json_encode($data['product']['category_ids']) ?>
+                                            }
                                         }
                                     }
                                 }
                             }
-                        }
-                    </script>
+                        </script>
                 <?php } else { ?>
                     <div class="wk-field wk-category">
                         <div class="wk-for-validation">
-                            <div id="wk-category-label"><?= $escaper->escapeHtml(__("CATEGORIES")); ?></div>
+                            <div id="wk-category-label">
+                                <?= $escaper->escapeHtml(__("CATEGORIES")); ?>
+                            </div>
                             <?php
                             $categories = $data['product']['category_ids'];
                             foreach ($categories as $value) { ?>
-                                <input type="hidden" name="product[category_ids][]" 
-                                value="<?= $escaper->escapeHtml($value); ?>"
-                                 id="wk-cat-hide<?= $escaper->escapeHtml($value); ?>"/>
+                                <input type="hidden" name="product[category_ids][]" value="<?= $escaper->escapeHtml($value); ?>"
+                                    id="wk-cat-hide<?= $escaper->escapeHtml($value); ?>" />
                             <?php } ?>
                             <?php
                             if ($helper->getAllowedCategoryIds()) {
@@ -123,15 +134,13 @@ if (!empty($data['set'])) {
                                                 <?= $escaper->escapeHtml($cat_model->getName()) ?>
                                             </span>
                                             <?php
-                                            if (in_array($cat_model["entity_id"], $categories)) {?>
-                                                <input class="wk-elements" type="checkbox" 
-                                                name="product[category_ids][]" 
-                                                value=<?= $escaper->escapeHtml($cat_model['entity_id']) ?> checked />
+                                            if (in_array($cat_model["entity_id"], $categories)) { ?>
+                                                <input class="wk-elements" type="checkbox" name="product[category_ids][]"
+                                                    value=<?= $escaper->escapeHtml($cat_model['entity_id']) ?> checked />
                                                 <?php
                                             } else { ?>
-                                                <input class="wk-elements" type="checkbox" 
-                                                name="product[category_ids][]" 
-                                                value='<?= $escaper->escapeHtml($cat_model['entity_id']) ?>'/>
+                                                <input class="wk-elements" type="checkbox" name="product[category_ids][]"
+                                                    value='<?= $escaper->escapeHtml($cat_model['entity_id']) ?>' />
                                                 <?php
                                             } ?>
                                         </div>
@@ -145,8 +154,10 @@ if (!empty($data['set'])) {
                                 $_categories = $category_helper->getStoreCategories();
                                 foreach ($_categories as $_category) {
                                     $count++;
-                                    if (count($category_model->getAllChildren($category_model
-                                    ->load($_category['entity_id'])))-1 > 0) { ?>
+                                    if (
+                                        count($category_model->getAllChildren($category_model
+                                            ->load($_category['entity_id']))) - 1 > 0
+                                    ) { ?>
                                         <div class="wk-cat-container" style="margin-left:0px;">
                                             <span class="wk-plus">
                                             </span><span class="wk-foldersign"></span>
@@ -154,15 +165,13 @@ if (!empty($data['set'])) {
                                                 <?= $escaper->escapeHtml($_category->getName()) ?>
                                             </span>
                                             <?php
-                                            if (in_array($_category["entity_id"], $categories)) {?>
-                                                <input class="wk-elements" type="checkbox" 
-                                                name="product[category_ids][]"
-                                                 value=<?= $escaper->escapeHtml($_category['entity_id']) ?> checked />
+                                            if (in_array($_category["entity_id"], $categories)) { ?>
+                                                <input class="wk-elements" type="checkbox" name="product[category_ids][]"
+                                                    value=<?= $escaper->escapeHtml($_category['entity_id']) ?> checked />
                                                 <?php
                                             } else { ?>
-                                                <input class="wk-elements" type="checkbox" 
-                                                name="product[category_ids][]" 
-                                                value='<?= $escaper->escapeHtml($_category['entity_id']) ?>'/>
+                                                <input class="wk-elements" type="checkbox" name="product[category_ids][]"
+                                                    value='<?= $escaper->escapeHtml($_category['entity_id']) ?>' />
                                                 <?php
                                             } ?>
                                         </div>
@@ -171,17 +180,16 @@ if (!empty($data['set'])) {
                                         <div class="wk-cat-container">
                                             </span><span class="wk-foldersign"></span>
                                             <span class="wk-elements wk-cat-name">
-                                                <?= $escaper->escapeHtml($_category->getName()) ?></span>
+                                                <?= $escaper->escapeHtml($_category->getName()) ?>
+                                            </span>
                                             <?php
-                                            if (in_array($_category["entity_id"], $categories)) {?>
-                                                <input class="wk-elements" type="checkbox" 
-                                                name="product[category_ids][]" 
-                                                value=<?= $escaper->escapeHtml($_category['entity_id']) ?> checked />
+                                            if (in_array($_category["entity_id"], $categories)) { ?>
+                                                <input class="wk-elements" type="checkbox" name="product[category_ids][]"
+                                                    value=<?= $escaper->escapeHtml($_category['entity_id']) ?> checked />
                                                 <?php
                                             } else { ?>
-                                                <input class="wk-elements" type="checkbox"
-                                                 name="product[category_ids][]" 
-                                                 value='<?= $escaper->escapeHtml($_category['entity_id']) ?>'/>
+                                                <input class="wk-elements" type="checkbox" name="product[category_ids][]"
+                                                    value='<?= $escaper->escapeHtml($_category['entity_id']) ?>' />
                                                 <?php
                                             } ?>
                                         </div>
@@ -194,32 +202,57 @@ if (!empty($data['set'])) {
                 <?php } ?>
             </div>
             <div class="field required">
-                <label class="label"><?= $escaper->escapeHtml(__('Product Name')) ?>:</label>
+                <label class="label">
+                    <?= $escaper->escapeHtml(__('Product Name')) ?>:
+                </label>
                 <?php
-                if ($product_hint_status && $helper->getProductHintName()) {?>
+                if ($product_hint_status && $helper->getProductHintName()) { ?>
                     <img src="<?= $escaper->escapeUrl($block
-                    ->getViewFileUrl('Webkul_Marketplace::images/quest.png')); ?>"
-                     class='questimg' title="<?= $escaper->escapeHtml($helper->getProductHintName()) ?>"/>
+                        ->getViewFileUrl('Webkul_Marketplace::images/quest.png')); ?>" class='questimg'
+                        title="<?= $escaper->escapeHtml($helper->getProductHintName()) ?>" />
                     <?php
                 } ?>
                 <div class="control">
-                    <input type="text" class="required-entry input-text" name="product[name]"
-                     id="name" value="<?= $escaper->escapeHtml($data['product']['name'])?>"/>
+                    <input type="text" class="required-entry input-text" name="product[name]" id="name"
+                        value="<?= $escaper->escapeHtml($data['product']['name']) ?>" />
                 </div>
             </div>
             <div class="field required">
-                <label class="label"><?= $escaper->escapeHtml(__('Description')) ?>:</label>
+                <label class="label">
+                    <?= $escaper->escapeHtml(__('Condition')) ?>:
+                </label>
+                <div class="control">
+                    <select name="product[condicion]" id="condition" class="required-entry">
+                        <?php foreach ($condicionOptions as $option): ?>
+                            <option value="<?= $escaper->escapeHtml($option['value']) ?>" 
+                            <?php 
+                                if ($option['value'] == 4) {
+                                    echo ' selected="selected"';
+                                } elseif (isset($data['product']['condicion']) && $data['product']['condicion'] == $option['value']) { 
+                                    echo ' selected="selected"';
+                                } 
+                            ?>>
+                                <?= $escaper->escapeHtml($option['label']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+            <div class="field required">
+                <label class="label">
+                    <?= $escaper->escapeHtml(__('Description')) ?>:
+                </label>
                 <?php
-                if ($product_hint_status && $helper->getProductHintDesc()) {?>
+                if ($product_hint_status && $helper->getProductHintDesc()) { ?>
                     <img src="<?= $escaper->escapeUrl($block
-                    ->getViewFileUrl('Webkul_Marketplace::images/quest.png')); ?>" class='questimg' 
-                    title="<?=  $escaper->escapeHtml($helper->getProductHintDesc()) ?>"/>
+                        ->getViewFileUrl('Webkul_Marketplace::images/quest.png')); ?>" class='questimg'
+                        title="<?= $escaper->escapeHtml($helper->getProductHintDesc()) ?>" />
                     <?php
                 } ?>
                 <div class="control wk-border-box-sizing">
-                    <textarea name="product[description]" class="required-entry input-text" 
-                    id="description" rows="5" cols="75" >
-                    <?= /* @noEscape */  $data['product']['description']?></textarea>
+                    <textarea name="product[description]" class="required-entry input-text" id="description" rows="5"
+                        cols="75">
+                    <?= /* @noEscape */$data['product']['description'] ?></textarea>
                     <?php if ($helper->isWysiwygEnabled()): ?>
                         <script>
                             require([
@@ -227,20 +260,20 @@ if (!empty($data['set'])) {
                                 "mage/translate",
                                 "mage/adminhtml/events",
                                 "mage/adminhtml/wysiwyg/tiny_mce/setup"
-                            ], function(jQuery) {
+                            ], function (jQuery) {
                                 wysiwygDescription = new wysiwygSetup("description", {
-                                    "width" : "100%",
-                                    "height" : "200px",
-                                    "plugins" : [{"name":"image"}],
-                                    "tinymce" : {
-                                        "toolbar":"formatselect | bold italic underline | "+
-                                        "alignleft aligncenter alignright |" + 
-                                        "bullist numlist |"+
-                                        "link table charmap","plugins":"advlist "+
-                                        "autolink lists link charmap media noneditable table "+
-                                        "contextmenu paste code help table",
+                                    "width": "100%",
+                                    "height": "200px",
+                                    "plugins": [{ "name": "image" }],
+                                    "tinymce": {
+                                        "toolbar": "formatselect | bold italic underline | " +
+                                            "alignleft aligncenter alignright |" +
+                                            "bullist numlist |" +
+                                            "link table charmap", "plugins": "advlist " +
+                                                "autolink lists link charmap media noneditable table " +
+                                                "contextmenu paste code help table",
                                     },
-                                    files_browser_window_url: "<?= /* @noEscape */$block->getWysiwygUrl();?>"
+                                    files_browser_window_url: "<?= /* @noEscape */$block->getWysiwygUrl(); ?>"
                                 });
                                 wysiwygDescription.setup("exact");
                             });
@@ -250,16 +283,18 @@ if (!empty($data['set'])) {
             </div>
 
             <div class="field" style="display: none;">
-                <label class="label"><?= $escaper->escapeHtml(__('Short Description')) ?>:</label>
+                <label class="label">
+                    <?= $escaper->escapeHtml(__('Short Description')) ?>:
+                </label>
                 <?php if ($product_hint_status && $helper->getProductHintShortDesc()) { ?>
                     <img src="<?= $escaper->escapeUrl($block
-                    ->getViewFileUrl('Webkul_Marketplace::images/quest.png')); ?>"
-                     class='questimg' title="<?= $escaper->escapeHtml($helper->getProductHintShortDesc()) ?>"/>
+                        ->getViewFileUrl('Webkul_Marketplace::images/quest.png')); ?>" class='questimg'
+                        title="<?= $escaper->escapeHtml($helper->getProductHintShortDesc()) ?>" />
                 <?php } ?>
                 <div class="control wk-border-box-sizing">
-                    <textarea name="product[short_description]" class="input-text"
-                     id="short_description" rows="5" cols="75" >
-                     <?= /* @noEscape */ $data['product']['short_description']?></textarea>
+                    <textarea name="product[short_description]" class="input-text" id="short_description" rows="5"
+                        cols="75">
+                     <?= /* @noEscape */$data['product']['short_description'] ?></textarea>
                     <?php if ($helper->isWysiwygEnabled()): ?>
                         <script>
                             require([
@@ -267,20 +302,20 @@ if (!empty($data['set'])) {
                                 "mage/translate",
                                 "mage/adminhtml/events",
                                 "mage/adminhtml/wysiwyg/tiny_mce/setup"
-                            ], function(jQuery) {
+                            ], function (jQuery) {
                                 wysiwygShortDescription = new wysiwygSetup("short_description", {
-                                    "width" : "100%",
-                                    "height" : "200px",
-                                    "plugins" : [{"name":"image"}],
-                                    "tinymce" : {
-                                        "toolbar":"formatselect | bold italic underline | "+
-                                        "alignleft aligncenter alignright |" + 
-                                        "bullist numlist |"+
-                                        "link table charmap","plugins":"advlist "+
-                                        "autolink lists link charmap media noneditable table "+
-                                        "contextmenu paste code help table",
+                                    "width": "100%",
+                                    "height": "200px",
+                                    "plugins": [{ "name": "image" }],
+                                    "tinymce": {
+                                        "toolbar": "formatselect | bold italic underline | " +
+                                            "alignleft aligncenter alignright |" +
+                                            "bullist numlist |" +
+                                            "link table charmap", "plugins": "advlist " +
+                                                "autolink lists link charmap media noneditable table " +
+                                                "contextmenu paste code help table",
                                     },
-                                    files_browser_window_url: "<?= /* @noEscape */$block->getWysiwygUrl();?>"
+                                    files_browser_window_url: "<?= /* @noEscape */$block->getWysiwygUrl(); ?>"
                                 });
                                 wysiwygShortDescription.setup("exact");
                             });
@@ -290,227 +325,274 @@ if (!empty($data['set'])) {
             </div>
             <?php if ($skuType == 'static'): ?>
                 <div class="field required">
-                    <label class="label"><?= $escaper->escapeHtml(__('SKU')) ?>:</label>
+                    <label class="label">
+                        <?= $escaper->escapeHtml(__('SKU')) ?>:
+                    </label>
                     <?php
                     if ($skuPrefix && $skuType == 'dynamic') {
-                        /* @noEscape */ echo "(Prefix - ".$skuPrefix.")";
+                        /* @noEscape */echo "(Prefix - " . $skuPrefix . ")";
                     }
                     ?>
                     <?php if ($product_hint_status && $helper->getProductHintSku()): ?>
                         <img src="<?= $escaper->escapeUrl($block
-                        ->getViewFileUrl('Webkul_Marketplace::images/quest.png')); ?>" class='questimg' 
-                        title="<?= $escaper->escapeHtml($helper->getProductHintSku()) ?>"/>
+                            ->getViewFileUrl('Webkul_Marketplace::images/quest.png')); ?>" class='questimg'
+                            title="<?= $escaper->escapeHtml($helper->getProductHintSku()) ?>" />
                     <?php endif; ?>
                     <div class="control">
-                        <input name="product[sku]" id="sku" 
-                        class="required-entry validate-length maximum-length-64 input-text" type="text" 
-                        value="<?= $escaper->escapeHtml($data['product']['sku'])?>"/>
+                        <input name="product[sku]" id="sku"
+                            class="required-entry validate-length maximum-length-64 input-text" type="text"
+                            value="<?= $escaper->escapeHtml($data['product']['sku']) ?>" />
                     </div>
-                    <div id="skuavail" >
-                        <span class="success-msg skuavailable"><?= $escaper->escapeHtml(__('SKU Available')) ?></span>
+                    <div id="skuavail">
+                        <span class="success-msg skuavailable">
+                            <?= $escaper->escapeHtml(__('SKU Available')) ?>
+                        </span>
                     </div>
-                    <div id="skunotavail" >
+                    <div id="skunotavail">
                         <span class="error-msg skunotavailable">
-                            <?= $escaper->escapeHtml(__('SKU Already Exist')) ?></span>
+                            <?= $escaper->escapeHtml(__('SKU Already Exist')) ?>
+                        </span>
                     </div>
                 </div>
             <?php endif; ?>
             <div class="field required">
-                <label class="label"><?= $escaper->escapeHtml(__('Price')) ?><b>
-                    <?= /* @noEscape */ " (".$currency_symbol.")"; ?></b>:</label>
+                <label class="label">
+                    <?= $escaper->escapeHtml(__('Price')) ?><b>
+                        <?= /* @noEscape */" (" . $currency_symbol . ")"; ?>
+                    </b>:
+                </label>
                 <?php if ($product_hint_status && $helper->getProductHintPrice()): ?>
                     <img src="<?= $escaper->escapeUrl($block
-                    ->getViewFileUrl('Webkul_Marketplace::images/quest.png')); ?>" class='questimg' 
-                    title="<?= $escaper->escapeHtml($helper->getProductHintPrice()) ?>"/>
+                        ->getViewFileUrl('Webkul_Marketplace::images/quest.png')); ?>" class='questimg'
+                        title="<?= $escaper->escapeHtml($helper->getProductHintPrice()) ?>" />
                 <?php endif; ?>
                 <div class="control">
-                    <input type="text" class="required-entry validate-zero-or-greater input-text" 
-                    name="product[price]" id="price" value="<?= /* @noEscape */ $data['product']['price']?>"/>
+                    <input type="text" class="required-entry validate-zero-or-greater input-text" name="product[price]"
+                        id="price" value="<?= /* @noEscape */$data['product']['price'] ?>" />
                 </div>
             </div>
             <div class="field" style="display: none;">
-                <label class="label"><?= $escaper->escapeHtml(__('Special Price')) ?><b>
-                    <?= /* @noEscape */ " (".$currency_symbol.")"; ?></b>:</label>
+                <label class="label">
+                    <?= $escaper->escapeHtml(__('Special Price')) ?><b>
+                        <?= /* @noEscape */" (" . $currency_symbol . ")"; ?>
+                    </b>:
+                </label>
                 <?php if ($product_hint_status && $helper->getProductHintSpecialPrice()): ?>
                     <img src="<?= $escaper->escapeUrl($block
-                    ->getViewFileUrl('Webkul_Marketplace::images/quest.png')); ?>" class='questimg' 
-                    title="<?= $escaper->escapeHtml($helper->getProductHintSpecialPrice()) ?>"/>
+                        ->getViewFileUrl('Webkul_Marketplace::images/quest.png')); ?>" class='questimg'
+                        title="<?= $escaper->escapeHtml($helper->getProductHintSpecialPrice()) ?>" />
                 <?php endif; ?>
                 <div class="control">
                     <input type="text" class="widthinput input-text validate-zero-or-greater"
-                     name="product[special_price]" id="special-price" 
-                     value="<?= /* @noEscape */ $data['product']['special_price']?>"/>
+                        name="product[special_price]" id="special-price"
+                        value="<?= /* @noEscape */$data['product']['special_price'] ?>" />
                 </div>
             </div>
             <div class="field" style="display: none;">
-                <label class="label"><?= $escaper->escapeHtml(__('Special Price From')) ?>:</label>
+                <label class="label">
+                    <?= $escaper->escapeHtml(__('Special Price From')) ?>:
+                </label>
                 <?php if ($product_hint_status && $helper->getProductHintStartDate()): ?>
                     <img src="<?= $escaper->escapeUrl($block
-                    ->getViewFileUrl('Webkul_Marketplace::images/quest.png')); ?>" class='questimg' 
-                    title="<?= $escaper->escapeHtml($helper->getProductHintStartDate()) ?>"/>
+                        ->getViewFileUrl('Webkul_Marketplace::images/quest.png')); ?>" class='questimg'
+                        title="<?= $escaper->escapeHtml($helper->getProductHintStartDate()) ?>" />
                 <?php endif; ?>
                 <div class="control">
-                    <input type="text" name="product[special_from_date]" id="special-from-date" 
-                    class="input-text" value="<?= /* @noEscape */ $data['product']['special_from_date']?>"/>
+                    <input type="text" name="product[special_from_date]" id="special-from-date" class="input-text"
+                        value="<?= /* @noEscape */$data['product']['special_from_date'] ?>" />
                 </div>
             </div>
             <div class="field" style="display: none;">
-                <label class="label"><?= $escaper->escapeHtml(__('Special Price To')) ?>:</label>
+                <label class="label">
+                    <?= $escaper->escapeHtml(__('Special Price To')) ?>:
+                </label>
                 <?php if ($product_hint_status && $helper->getProductHintEndDate()): ?>
                     <img src="<?= $escaper->escapeUrl($block
-                    ->getViewFileUrl('Webkul_Marketplace::images/quest.png')); ?>" class='questimg' 
-                    title="<?= $escaper->escapeHtml($helper->getProductHintEndDate()) ?>"/>
+                        ->getViewFileUrl('Webkul_Marketplace::images/quest.png')); ?>" class='questimg'
+                        title="<?= $escaper->escapeHtml($helper->getProductHintEndDate()) ?>" />
                 <?php endif; ?>
                 <div class="control">
-                    <input type="text" name="product[special_to_date]" id="special-to-date" 
-                    class="input-text" value="<?= /* @noEscape */ $data['product']['special_to_date']?>"/>
+                    <input type="text" name="product[special_to_date]" id="special-to-date" class="input-text"
+                        value="<?= /* @noEscape */$data['product']['special_to_date'] ?>" />
                 </div>
             </div>
             <input id="inventory_manage_stock" type="hidden" name="product[stock_data][manage_stock]" value="1">
-            <input type="hidden" value="1" name="product[stock_data][use_config_manage_stock]" 
-            id="inventory_use_config_manage_stock">
+            <input type="hidden" value="1" name="product[stock_data][use_config_manage_stock]"
+                id="inventory_use_config_manage_stock">
             <div class="field required">
-                <label class="label"><?= $escaper->escapeHtml(__('Stock')) ?>:</label>
+                <label class="label">
+                    <?= $escaper->escapeHtml(__('Stock')) ?>:
+                </label>
                 <?php if ($product_hint_status && $helper->getProductHintQty()): ?>
                     <img src="<?= $escaper->escapeUrl($block
-                    ->getViewFileUrl('Webkul_Marketplace::images/quest.png')); ?>" class='questimg' 
-                    title="<?= $escaper->escapeHtml($helper->getProductHintQty()) ?>"/>
+                        ->getViewFileUrl('Webkul_Marketplace::images/quest.png')); ?>" class='questimg'
+                        title="<?= $escaper->escapeHtml($helper->getProductHintQty()) ?>" />
                 <?php endif; ?>
                 <div class="control">
-                    <input type="text" class="required-entry validate-number input-text" 
-                    name="product[quantity_and_stock_status][qty]" id="qty" 
-                    value="<?= /* @noEscape */ $data['product']['quantity_and_stock_status']['qty']?>"/>
+                    <input type="text" class="required-entry validate-number input-text"
+                        name="product[quantity_and_stock_status][qty]" id="qty"
+                        value="<?= /* @noEscape */$data['product']['quantity_and_stock_status']['qty'] ?>" />
                 </div>
             </div>
             <div class="field required">
-                <label class="label"><?= $escaper->escapeHtml(__('Stock Availability')) ?>:</label>
+                <label class="label">
+                    <?= $escaper->escapeHtml(__('Stock Availability')) ?>:
+                </label>
                 <?php if ($product_hint_status && $helper->getProductHintStock()): ?>
                     <img src="<?= $escaper->escapeUrl($block
-                    ->getViewFileUrl('Webkul_Marketplace::images/quest.png')); ?>" 
-                    class='questimg' title="<?= $escaper->escapeHtml($helper->getProductHintStock()) ?>"/>
+                        ->getViewFileUrl('Webkul_Marketplace::images/quest.png')); ?>" class='questimg'
+                        title="<?= $escaper->escapeHtml($helper->getProductHintStock()) ?>" />
                 <?php endif; ?>
                 <div class="control">
                     <select id="" class="select" name="product[quantity_and_stock_status][is_in_stock]">
                         <option value="1" <?php if ($data['product']['quantity_and_stock_status']['is_in_stock'] == 1) {
-                             echo "selected='selected'";}?>><?= $escaper->escapeHtml(__("In Stock")); ?></option>
+                            echo "selected='selected'";
+                        } ?>><?= $escaper->escapeHtml(__("In Stock")); ?></option>
                         <option value="0" <?php if ($data['product']['quantity_and_stock_status']['is_in_stock'] == 0) {
-                             echo "selected='selected'";}?>><?= $escaper->escapeHtml(__("Out of Stock")); ?></option>
+                            echo "selected='selected'";
+                        } ?>><?= $escaper->escapeHtml(__("Out of Stock")); ?></option>
                     </select>
                 </div>
             </div>
-            <div class="field required">
-                <label class="label"><?= $escaper->escapeHtml(__('Visibility')) ?>:</label>
+            <div class="field required" style="display: none;">
+                <label class="label">
+                    <?= $escaper->escapeHtml(__('Visibility')) ?>:
+                </label>
                 <div class="control">
                     <select id="visibility" class=" required-entry required-entry select" name="product[visibility]">
-                        <option value=""><?= $escaper->escapeHtml(__('Please Select'))?></option>
+                        <option value="">
+                            <?= $escaper->escapeHtml(__('Please Select')) ?>
+                        </option>
                         <?php $product_visibility = $helper->getVisibilityOptionArray(); ?>
+                        <?php $index = 1; ?>
                         <?php foreach ($product_visibility as $key => $value): ?>
-                            <option value="<?= /* @noEscape */ $key ?>"
-                             <?php if ($key==$data['product']['visibility']) {
-                                    echo "selected='selected'";}?>><?=  /* @noEscape */ $value?></option>
+                            <option value="<?= /* @noEscape */$key ?>" <?php if ($index == 4) {
+                                   echo "selected='selected'";
+                               } ?>><?= /* @noEscape */$value ?></option>
+                            <?php $index++; ?>
                         <?php endforeach; ?>
                     </select>
                 </div>
             </div>
-            <div class="field required">
-                <label class="label"><?= $escaper->escapeHtml(__('Tax Class')) ?>:</label>
+            <div class="field required" style="display: none;">
+                <label class="label">
+                    <?= $escaper->escapeHtml(__('Tax Class')) ?>:
+                </label>
                 <?php if ($product_hint_status && $helper->getProductHintTax()): ?>
                     <img src="<?= $escaper->escapeUrl($block
-                    ->getViewFileUrl('Webkul_Marketplace::images/quest.png')); ?>"
-                     class='questimg' title="<?= $escaper->escapeHtml($helper->getProductHintTax()) ?>"/>
+                        ->getViewFileUrl('Webkul_Marketplace::images/quest.png')); ?>" class='questimg'
+                        title="<?= $escaper->escapeHtml($helper->getProductHintTax()) ?>" />
                 <?php endif; ?>
                 <div class="control">
-                    <select id="tax-class-id" class=" required-entry required-entry select" 
-                    name="product[tax_class_id]">
-                        <option value="0"><?= $escaper->escapeHtml(__('None'))?></option>
+                    <select id="tax-class-id" class=" required-entry required-entry select"
+                        name="product[tax_class_id]">
+                        <option value="0">
+                            <?= $escaper->escapeHtml(__('None')) ?>
+                        </option>
                         <?php $taxes = $helper->getTaxClassModel(); ?>
+                        <?php $index = 1; ?>
                         <?php foreach ($taxes as $tax): ?>
-                            <option value="<?= $escaper->escapeHtml($tax->getId()) ?>" 
-                            <?php if ($tax->getId()==$data['product']['tax_class_id']) { echo "selected='selected'";}?>>
-                            <?= $escaper->escapeHtml($tax->getClassName())?></option>
+                            <option value="<?= $escaper->escapeHtml($tax->getId()) ?>" <?php if ($index == 1) {
+                                  echo "selected='selected'";
+                              } ?>><?= $escaper->escapeHtml($tax->getClassName()) ?></option>
+                            <?php $index++; ?>
                         <?php endforeach; ?>
                     </select>
                 </div>
             </div>
-            <div class="field required">
-                <label class="label"><?= $escaper->escapeHtml(__('Weight')) ?> (<?= $escaper
-                ->escapeHtml($weightUnit)?>):</label>
+            <div class="field required" style="display: none;">
+                <label class="label">
+                    <?= $escaper->escapeHtml(__('Weight')) ?> (
+                    <?= $escaper->escapeHtml($weightUnit) ?>):
+                </label>
                 <?php if ($product_hint_status && $helper->getProductHintWeight()): ?>
                     <img src="<?= $escaper->escapeUrl($block
-                    ->getViewFileUrl('Webkul_Marketplace::images/quest.png')); ?>" class='questimg' 
-                    title="<?= $escaper->escapeHtml($helper->getProductHintWeight()) ?>"/>
+                        ->getViewFileUrl('Webkul_Marketplace::images/quest.png')); ?>" class='questimg'
+                        title="<?= $escaper->escapeHtml($helper->getProductHintWeight()) ?>" />
                 <?php endif; ?>
                 <div data-role="weight-switcher">
                     <label data-ui-id="product-tabs-attributes-tab-element-radios-product-product-has-weight-label"
-                     for="weight-switcher">
-                        <span><?= $escaper->escapeHtml(__('Does this have a weight?'))?></span>
+                        for="weight-switcher">
+                        <span>
+                            <?= $escaper->escapeHtml(__('Does this have a weight?')) ?>
+                        </span>
                     </label>
                     <div class="control">
                         <div class="control">
-                            <input type="radio" <?php if ($type!='virtual' || $type!='downloadable' ||
-                             $data['product']['product_has_weight']==1) { ?> checked="checked" <?php } ?>
-                              class="weight-switcher" id="weight-switcher1" value="1" 
-                              name="product[product_has_weight]">
+                            <input type="radio" class="weight-switcher" id="weight-switcher1" value="1"
+                                name="product[product_has_weight]">
                             <label for="weight-switcher1">
-                                <span><?= $escaper->escapeHtml(__('Yes'))?></span>
+                                <span>
+                                    <?= $escaper->escapeHtml(__('Yes')) ?>
+                                </span>
                             </label>
                         </div>
                         <div class="control">
-                            <input type="radio" class="weight-switcher" id="weight-switcher0" value="0" 
-                            name="product[product_has_weight]" <?php if ($type=='virtual' || $type=='downloadable' ||
-                             $data['product']['product_has_weight']==0) { ?> checked="checked" <?php } ?>>
+                            <input type="radio" class="weight-switcher" id="weight-switcher0" value="0"
+                                name="product[product_has_weight]" checked="checked">
                             <label for="weight-switcher0">
-                                <span><?= $escaper->escapeHtml(__('No'))?></span>
+                                <span>
+                                    <?= $escaper->escapeHtml(__('No')) ?>
+                                </span>
                             </label>
                         </div>
                     </div>
                 </div>
                 <div class="control">
-                    <input type="text" class="validate-zero-or-greater input-text" name="product[weight]" 
-                    id="weight" value="<?= /* @noEscape */ $data['product']['weight'] ?? '1' ?>"/>
+                    <input type="text" class="validate-zero-or-greater input-text" name="product[weight]" id="weight"
+                        value="<?= /* @noEscape */$data['product']['weight'] ?? '1' ?>" />
                 </div>
             </div>
-
             <div class="field" style="display: none;">
-                <label class="label"><?= $escaper->escapeHtml(__('Url Key')) ?>:</label>
+                <label class="label">
+                    <?= $escaper->escapeHtml(__('Url Key')) ?>:
+                </label>
                 <div class="control">
-                    <input type="text" class="input-text" name="product[url_key]" id="meta_title" 
-                     value="<?= /* @noEscape */ $data['product']['url_key']?>"/>
+                    <input type="text" class="input-text" name="product[url_key]" id="meta_title"
+                        value="<?= /* @noEscape */$data['product']['url_key'] ?>" />
                 </div>
             </div>
             <?php if (!$helper->getCustomerSharePerWebsite()): ?>
                 <div class="field required">
-                    <label class="label"><?= $escaper->escapeHtml(__('Product in Websites')) ?>:</label>
+                    <label class="label">
+                        <?= $escaper->escapeHtml(__('Product in Websites')) ?>:
+                    </label>
                     <div class="control">
                         <select id="websites" class="required-entry select" name="product[website_ids][]" multiple>
                             <?php $websites = $helper->getAllWebsites(); ?>
                             <?php foreach ($websites as $website): ?>
-                                <option value="<?= /* @noEscape */ $website->getWebsiteId() ?>">
-                                <?=  /* @noEscape */ $website->getName()?></option>
+                                <option value="<?= /* @noEscape */$website->getWebsiteId() ?>">
+                                    <?= /* @noEscape */$website->getName() ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
                 </div>
             <?php endif; ?>
             <div class="field" style="display: none;">
-                <label class="label"><?= $escaper->escapeHtml(__('Meta Title')) ?>:</label>
+                <label class="label">
+                    <?= $escaper->escapeHtml(__('Meta Title')) ?>:
+                </label>
                 <div class="control">
-                    <input type="text" class="input-text" name="product[meta_title]" id="meta_title" 
-                     value="<?= /* @noEscape */ $data['product']['meta_title']?>"/>
+                    <input type="text" class="input-text" name="product[meta_title]" id="meta_title"
+                        value="<?= /* @noEscape */$data['product']['meta_title'] ?>" />
                 </div>
             </div>
             <div class="field" style="display: none;">
-                <label class="label"><?= $escaper->escapeHtml(__('Meta Keywords')) ?>:</label>
+                <label class="label">
+                    <?= $escaper->escapeHtml(__('Meta Keywords')) ?>:
+                </label>
                 <div class="control">
                     <textarea class="textarea" id="meta_keyword"
-                     name="product[meta_keyword]"><?= /* @noEscape */ $data['product']['meta_keyword']?></textarea>
+                        name="product[meta_keyword]"><?= /* @noEscape */$data['product']['meta_keyword'] ?></textarea>
                 </div>
             </div>
             <div class="field" style="display: none;">
-                <label class="label"><?= $escaper->escapeHtml(__('Meta Description')) ?>:</label>
+                <label class="label">
+                    <?= $escaper->escapeHtml(__('Meta Description')) ?>:
+                </label>
                 <div class="control">
                     <textarea class="textarea" id="meta_description" name="product[meta_description]">
-                        <?= /* @noEscape */ $data['product']['meta_description']?></textarea>
+                        <?= /* @noEscape */$data['product']['meta_description'] ?></textarea>
                 </div>
             </div>
             <?= $block->getChildHtml(); ?>
@@ -520,10 +602,14 @@ if (!empty($data['set'])) {
 <?php
 $formData = [
     'countryPicSelector' => '#country-pic',
-    'verifySkuAjaxUrl' => $block->getUrl('marketplace/product/verifysku', ['_secure' => $block
-    ->getRequest()->isSecure()]),
-    'categoryTreeAjaxUrl' => $block->getUrl('marketplace/product/categorytree/', ['_secure' => $block
-    ->getRequest()->isSecure()])
+    'verifySkuAjaxUrl' => $block->getUrl('marketplace/product/verifysku', [
+        '_secure' => $block
+            ->getRequest()->isSecure()
+    ]),
+    'categoryTreeAjaxUrl' => $block->getUrl('marketplace/product/categorytree/', [
+        '_secure' => $block
+            ->getRequest()->isSecure()
+    ])
 ];
 $serializedFormData = $viewModel->getJsonHelper()->jsonEncode($formData);
 ?>
@@ -531,12 +617,12 @@ $serializedFormData = $viewModel->getJsonHelper()->jsonEncode($formData);
 <script type="text/x-magento-init">
     {
         "*": {
-            "sellerAddProduct": <?= /* @noEscape */ $serializedFormData; ?>
+            "sellerAddProduct": <?= /* @noEscape */$serializedFormData; ?>
         }
     }
 </script>
 <script type='text/javascript'>
-    require(['jquery', 'prototype', 'domReady!'], function($) {
+    require(['jquery', 'prototype', 'domReady!'], function ($) {
         var qty = $('#qty'),
             productType = $('#product_type_id').val(),
             stockAvailabilityField = $('#quantity_and_stock_status'),
@@ -554,7 +640,7 @@ $serializedFormData = $viewModel->getJsonHelper()->jsonEncode($formData);
     require([
         "jquery",
         "Webkul_Marketplace/catalog/type-events"
-    ], function($, TypeSwitcher){
+    ], function ($, TypeSwitcher) {
         var $form = $('[data-form=edit-product]');
         $form.data('typeSwitcher', TypeSwitcher.init());
     });

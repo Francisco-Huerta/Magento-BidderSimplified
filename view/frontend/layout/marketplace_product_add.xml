@@ -6,5 +6,8 @@
                 <argument name="template" xsi:type="string">Bidder_CustomSellerOptions::product/add.phtml</argument>
             </action>
         </referenceBlock>
+        <referenceBlock name="marketplace_product_add_downloadable" remove="true"/>
+        <referenceBlock name="marketplace_product_add_configurable" remove="true"/>
+        <referenceBlock name="marketplace_product_add_downloadable" remove="true"/>
     </body>
 </page>
