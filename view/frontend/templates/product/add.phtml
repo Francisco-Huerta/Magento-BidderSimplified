@@ -25,6 +25,7 @@ $weightUnit = $helper->getWeightUnit();
 $allowProductType = $block->getAllowedProductType();
 // Added the option to select if it's used or not
 $condicionOptions = $block->getAttributeOptions('condicion');
+$stateOptions = $block->getAttributeOptions('state');
 // echo "<pre>"; print_r($condicionOptions); exit;
 if (!empty($data['set'])) {
     $set = $data['set'];
@@ -77,7 +78,7 @@ if (!empty($data['set'])) {
                 <input type="hidden" name="set" id="attribute-set-id"
                     value="<?= $escaper->escapeHtml($allowedSets[0]['value']) ?>" />
             <?php endif; ?>
-            
+
             <div class="field" style="display: none;">
                 <label class="label">
                     <?= $escaper->escapeHtml(__('Product Category')) ?>:
@@ -92,23 +93,23 @@ if (!empty($data['set'])) {
                         <!-- ko template: getTemplate() --><!-- /ko -->
                     </div>
                     <script type="text/x-magento-init">
-                            {
-                                "*": {
-                                    "Magento_Ui/js/core/app": {
-                                        "components": {
-                                            "sellerCategory": {
-                                                "component": "Webkul_Marketplace/js/product/seller-category-tree",
-                                                "template" : "Webkul_Marketplace/seller-category-tree",
-                                                "filterOptions": true,
-                                                "levelsVisibility": "1",
-                                                "options": <?= /* @noEscape */$block->getCategoriesTree() ?>,
-                                                "value": <?= /* @noEscape */json_encode($data['product']['category_ids']) ?>
+                                {
+                                    "*": {
+                                        "Magento_Ui/js/core/app": {
+                                            "components": {
+                                                "sellerCategory": {
+                                                    "component": "Webkul_Marketplace/js/product/seller-category-tree",
+                                                    "template" : "Webkul_Marketplace/seller-category-tree",
+                                                    "filterOptions": true,
+                                                    "levelsVisibility": "1",
+                                                    "options": <?= /* @noEscape */$block->getCategoriesTree() ?>,
+                                                    "value": <?= /* @noEscape */json_encode($data['product']['category_ids']) ?>
+                                                }
                                             }
                                         }
                                     }
                                 }
-                            }
-                        </script>
+                            </script>
                 <?php } else { ?>
                     <div class="wk-field wk-category">
                         <div class="wk-for-validation">
@@ -222,13 +223,40 @@ if (!empty($data['set'])) {
                     <?= $escaper->escapeHtml(__('Condition')) ?>:
                 </label>
                 <div class="control">
-                    <select name="product[condicion]" id="condition" class="required-entry">
+                    <select name="product[condicion]" id="condition" class="required-entry"
+                        onchange="showHideState(this)">
+                        <?php $counter = 0; ?>
                         <?php foreach ($condicionOptions as $option): ?>
+                            <?php $counter++; ?>
+                            <?php if ($counter == 1)
+                                continue; // Skip the first option ?>
+                            <option value="<?= $escaper->escapeHtml($option['value']) ?>" <?php
+                              if ($counter == 2) { // Select the second option by default
+                                  echo ' selected="selected"';
+                              } elseif (isset($data['product']['condicion']) && $data['product']['condicion'] == $option['value']) {
+                                  echo ' selected="selected"';
+                              }
+                              ?>>
+                                <?= $escaper->escapeHtml($option['label']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+            <!-- This is the new div for the state options. It is hidden by default using inline CSS. -->
+            <div id="stateDiv" class="field required" style="display: none;">
+                <label class="label">
+                    <?= $escaper->escapeHtml(__('Estado del Producto')) ?>:
+                </label>
+                <div class="control">
+                    <select name="product[state]" id="state" class="required-entry">
+                        <?php $counter = 0; ?>
+                        <?php foreach ($stateOptions as $option): ?>
+                            <?php $counter++; ?>
+                            <?php if($counter == 1) continue; // Skip the first option ?>
                             <option value="<?= $escaper->escapeHtml($option['value']) ?>" 
                             <?php 
-                                if ($option['value'] == 4) {
-                                    echo ' selected="selected"';
-                                } elseif (isset($data['product']['condicion']) && $data['product']['condicion'] == $option['value']) { 
+                                if ($counter == 2) { // Select the second option by default
                                     echo ' selected="selected"';
                                 } 
                             ?>>
@@ -467,8 +495,8 @@ if (!empty($data['set'])) {
                         <?php $index = 1; ?>
                         <?php foreach ($product_visibility as $key => $value): ?>
                             <option value="<?= /* @noEscape */$key ?>" <?php if ($index == 4) {
-                                   echo "selected='selected'";
-                               } ?>><?= /* @noEscape */$value ?></option>
+                                  echo "selected='selected'";
+                              } ?>><?= /* @noEscape */$value ?></option>
                             <?php $index++; ?>
                         <?php endforeach; ?>
                     </select>
@@ -650,6 +678,23 @@ $serializedFormData = $viewModel->getJsonHelper()->jsonEncode($formData);
         "*": {
             "Webkul_Marketplace/js/product/weight-handler": {},
             "Webkul_Marketplace/catalog/apply-to-type-switcher": {}
+        }
+    }
+</script>
+<!-- Here's the JavaScript code that will show or hide the state options div based on the selected option in the condition select. -->
+<script>
+    function showHideState(selectElement) {
+        // Get the index of the selected option.
+        var selectedIndex = selectElement.selectedIndex;
+
+        // Get the state options div.
+        var stateDiv = document.getElementById('stateDiv');
+
+        // If the third option is selected, show the state options div; otherwise, hide it.
+        if (selectedIndex == 1) { // Option indices start from 0, so the third option has index 2.
+            stateDiv.style.display = 'block';
+        } else {
+            stateDiv.style.display = 'none';
         }
     }
 </script>
